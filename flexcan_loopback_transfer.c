@@ -75,67 +75,42 @@ static FLEXCAN_CALLBACK(flexcan_callback)
     }
 }
 
-void configureRGBLED(void) {
-    // Iniciar clocks
-    CLOCK_EnableClock(kCLOCK_PortB);
-    CLOCK_EnableClock(kCLOCK_PortE);
-
-    // Definir configuración de pines
-    gpio_pin_config_t led_config = {
+void configure_pin_relay(void) {
+	/* Define the init structure for the output relay pin*/
+    gpio_pin_config_t relay_config = {
         kGPIO_DigitalOutput,
         0,
     };
 
-    GPIO_PinInit(GPIOB, 21, &led_config); // Red LED
-    GPIO_PinInit(GPIOB, 22, &led_config); // Green LED
-    GPIO_PinInit(GPIOE, 26, &led_config); // Blue LED
+    /* Enabling clocks */
+    CLOCK_EnableClock(kCLOCK_PortB);
+
+    /* Board pin, clock, debug console init */
+    BOARD_InitBootPins();
+    BOARD_InitBootClocks();
+
+    /* Init output LED GPIO. */
+    GPIO_PinInit(GPIOB, 18U, &relay_config);
 }
 
-void redLEDOn(void) {
-    GPIO_PortSet(GPIOB, 1u << 21); // Red LED
-}
-
-void redLEDOff(void) {
-    GPIO_PortClear(GPIOB, 1u << 21); // Red LED
-}
-void blueLEDOn(void) {
-    GPIO_PortSet(GPIOE, 1u << 26); // Blue LED
-}
-void blueLEDOff(void) {
-    GPIO_PortClear(GPIOE, 1u << 26); // Blue LED
-}
-void greenLEDOn(void) {
-    GPIO_PortSet(GPIOB, 1u << 22); // Green LED
-}
-
-void greenLEDOff(void) {
-    GPIO_PortClear(GPIOB, 1u << 22); // Green LED
-}
-void Configure_CAN_Pins ()
+void Configure_CAN_Pins()
 {
 	PORT_SetPinMux(PORTB, 18, kPORT_MuxAlt2); //Tx
 	PORT_SetPinMux(PORTB, 19, kPORT_MuxAlt2); //Rx
 }
-void readTemp(uint32_t temp)
+
+void read_humidity(uint32_t hmdt)
 {
-	blueLEDOff();
-    redLEDOff();
-    greenLEDOff;
-    if(temp > 20 && temp < 28)
+    if(hmdt > 20 && hmdt < 28)
     {
-    	blueLEDOn();
-    }
-    else if(temp >= 28)
-    {
-    	greenLEDOn();
+    	GPIO_PortSet(GPIOB, 1u << 18U);
     }
     else
     {
-    	greenLEDOn();
-    	redLEDOn();
-
+    	GPIO_PortClear(GPIOB, 1u << 18U);
     }
 }
+
 /*!
  * @brief Main function
  */
@@ -150,8 +125,8 @@ int main(void)
     BOARD_InitBootPins();
     BOARD_InitBootClocks();
     BOARD_InitDebugConsole();
-    Configure_CAN_Pins ();
-    configureRGBLED();
+    Configure_CAN_Pins();
+    configure_pin_relay();
 
     /* Init FlexCAN module. */
     /*
@@ -232,10 +207,6 @@ uint32_t data = 0;
 
 		rxComplete = false;
 		data = rxFrame.dataWord0;
-		void readTemp(data);
-
+		void read_humidity(data);
     }
-
 }
-
-
