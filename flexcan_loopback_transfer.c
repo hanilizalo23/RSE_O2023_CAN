@@ -86,11 +86,11 @@ void configure_pin_relay(void) {
     CLOCK_EnableClock(kCLOCK_PortB);
 
     /* Board pin, clock, debug console init */
-    BOARD_InitBootPins();
+    BOARD_InitBootPins(); // PORT_SetPinMux(PORTB, 20U, kPORT_MuxAsGpio);
     BOARD_InitBootClocks();
 
     /* Init output LED GPIO. */
-    GPIO_PinInit(GPIOB, 18U, &relay_config);
+    GPIO_PinInit(GPIOB, 20U, &relay_config);
 }
 
 void Configure_CAN_Pins()
@@ -103,11 +103,11 @@ void read_humidity(uint32_t hmdt)
 {
     if(hmdt > 20 && hmdt < 28)
     {
-    	GPIO_PortSet(GPIOB, 1u << 18U);
+    	GPIO_PortSet(GPIOB, 1u << 20U);
     }
     else
     {
-    	GPIO_PortClear(GPIOB, 1u << 18U);
+    	GPIO_PortClear(GPIOB, 1u << 20U);
     }
 }
 
